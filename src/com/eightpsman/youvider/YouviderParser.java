@@ -35,17 +35,15 @@ public class YouviderParser {
                 e.printStackTrace();
             }
 
-            System.out.println(adaptive_fmts);
+//            System.out.println(adaptive_fmts);
 
             // Get chanel info
             String[] chanels = adaptive_fmts.split(",");
             for (String chanel : chanels){
-                System.out.print("++" + chanel);
                 Map<String, String> chanelInfo = new HashMap<String, String>();
                 // Get chanel params
                 String[] params = chanel.split("\\\\u0026");
                 for (String param : params){
-                    System.out.println("--" + param);
                     if (param.contains(";")){
                         String[] segments = param.split(";");
                         for (String segment : segments){
@@ -57,11 +55,11 @@ public class YouviderParser {
                         chanelInfo.put(valuePair[0], valuePair[1]);
                     }
                 }
+                System.out.println(chanelInfo);
                 YouviderChunk chunk = new YouviderChunk(chanelInfo);
                 chunks.add(chunk);
             }
         }
-
         return chunks;
     }
 
