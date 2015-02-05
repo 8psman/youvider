@@ -28,17 +28,15 @@ public class YouviderParser {
     public static final String VIDEO_PARAM_TITLE = "title";
 
     public static String parseVideoInfo(String content) {
-        String videoInfo = "";
+        String videoInfo = null;
+
         Pattern pattern = Pattern.compile(VIDEO_INFO_REGEX);
 
         Matcher matcher = pattern.matcher(content);
 
         if (matcher.find()) {
-            System.out.println(matcher.group(0));
             videoInfo = matcher.group(matcher.groupCount());
-            System.out.println(videoInfo);
         }
-
         return videoInfo;
     }
 
@@ -52,63 +50,58 @@ public class YouviderParser {
         Matcher matcher = pattern.matcher(content);
 
         if (matcher.find()){
-            System.out.println(matcher.group(0));
             param = matcher.group(matcher.groupCount());
-            System.out.println(param);
         }
         return param;
     }
 
-    public static YouviderMpd parseAdaptiveStream(String pageContent){
-        // Get video information
-        String content = parseVideoInfo(pageContent);
-
-        YouviderMpd mpd = new YouviderMpd();
-
-        Pattern pattern = Pattern.compile(ADAPTIVE_STREAM_REGEX);
-
-        Matcher matcher = pattern.matcher(content);
-
-        if (matcher.find()){
-            // Get adaptive streaming data
-            String adaptive_fmts = matcher.group(matcher.groupCount());
-
-            // Do not decode before parsing
-//            try {
-//                adaptive_fmts = URLDecoder.decode(adaptive_fmts, "UTF-8");
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
+//    public static YouviderMpd parseAdaptiveStream(String pageContent){
+//        // Get video information
+//        String content = parseVideoInfo(pageContent);
+//
+//        YouviderMpd mpd = new YouviderMpd();
+//
+//        Pattern pattern = Pattern.compile(ADAPTIVE_STREAM_REGEX);
+//
+//        Matcher matcher = pattern.matcher(content);
+//
+//        if (matcher.find()){
+//            // Get adaptive streaming data
+//            String adaptive_fmts = matcher.group(matcher.groupCount());
+//
+//            // Do not decode before parsing
+////            try {
+////                adaptive_fmts = URLDecoder.decode(adaptive_fmts, "UTF-8");
+////            } catch (UnsupportedEncodingException e) {
+////                e.printStackTrace();
+////            }
+//
+//            // Get chanel info
+//            String[] presentations = adaptive_fmts.split(",");
+//            for (String presentation : presentations){
+//                Map<String, String> presentationInfo = new HashMap<String, String>();
+//                // Get chanel params
+//                String[] params = presentation.split("\\\\u0026");
+//                for (String param : params){
+//                    if (param.contains(";")){
+//                        String[] segments = param.split(";");
+//                        for (String segment : segments){
+//                            String[] valuePair = segment.split("=", 2);
+//                            presentationInfo.put(valuePair[0], valuePair[1]);
+//                        }
+//                    }else{
+//                        String[] valuePair = param.split("=", 2);
+//                        presentationInfo.put(valuePair[0], valuePair[1]);
+//                    }
+//                }
+//                mpd.addMpd(presentationInfo);
 //            }
+//        }
+//        return mpd;
+//    }
 
-            // Get chanel info
-            String[] presentations = adaptive_fmts.split(",");
-            for (String presentation : presentations){
-                Map<String, String> presentationInfo = new HashMap<String, String>();
-                // Get chanel params
-                String[] params = presentation.split("\\\\u0026");
-                for (String param : params){
-                    if (param.contains(";")){
-                        String[] segments = param.split(";");
-                        for (String segment : segments){
-                            String[] valuePair = segment.split("=", 2);
-                            presentationInfo.put(valuePair[0], valuePair[1]);
-                        }
-                    }else{
-                        String[] valuePair = param.split("=", 2);
-                        presentationInfo.put(valuePair[0], valuePair[1]);
-                    }
-                }
-                mpd.addMpd(presentationInfo);
-            }
-        }
-        return mpd;
-    }
-
-    public static YouviderMpd parseEncodedStream(String pageContent){
-        // Get video information
-        String content = parseVideoInfo(pageContent);
-
-        YouviderMpd mpd = new YouviderMpd();
+    public static List<EncodedStream> parseEncodedStream(String content){
+        List<EncodedStream> streams = new ArrayList<EncodedStream>();
 
         Pattern pattern = Pattern.compile(ENCODED_STREAM_REGEX);
 
@@ -142,22 +135,20 @@ public class YouviderParser {
                         }
                     }else{
                         String[] valuePair = param.split("=", 2);
+                        // Decode content
                         String key = decodeUTF8(valuePair[0]);
                         String value = decodeUTF8(valuePair[1]);
                         presentationInfo.put(key, value);
                     }
                 }
-                mpd.addMpd(presentationInfo);
+
+                String url = presentationInfo.get("url");
+                int itag = Integer.parseInt(presentationInfo.get("itag"));
+                streams.add(new EncodedStream(itag, url));
             }
         }
 
-        // Get video information
-        String title = getVideoParam(content, VIDEO_PARAM_TITLE);
-        if (title != null)
-            mpd.addInfo(VIDEO_PARAM_TITLE, title);
-
-        mpd.sortByQualityDescending();
-        return mpd;
+        return streams;
     }
 
     public static String decodeUTF8(String content){

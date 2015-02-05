@@ -1,7 +1,6 @@
 package com.eightpsman.youvider;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -9,7 +8,7 @@ import java.util.List;
  * Created by 8psman on 2/4/2015.
  * Email: 8psman@gmail.com
  */
-public class Youvitag{
+public class Itag {
 
 //    private static Map<Integer, String> itags = new HashMap<Integer, String>();
 
@@ -33,39 +32,39 @@ public class Youvitag{
 //        itags.put(102, "High Quality 3D, 720p, WebM, 1280x720");
 //    }
 
-    public static List<Youvitag> itags = new ArrayList<Youvitag>();
+    public static List<Itag> itags = new ArrayList<Itag>();
 
     static{
-        itags.add(new Youvitag( 17, "Low Quality"           , "144p"    , "3GP"     , "176x144"));
-        itags.add(new Youvitag( 36, "Low Quality"           , "240p"    , "3GP"     , "320x180"));
-        itags.add(new Youvitag(  5, "Low Quality"           , "240p"    , "FLV"     , "426x240"));
-        itags.add(new Youvitag( 34, "Medium Quality"        , "360p"    , "FLV"     , "640x360"));
-        itags.add(new Youvitag( 18, "Medium Quality"        , "360p"    , "MP4"     , "640x360"));
-        itags.add(new Youvitag( 43, "Medium Quality"        , "360p"    , "WebM"    , "640x360"));
-        itags.add(new Youvitag( 82, "Medium Quality 3D"     , "360p"    , "MP4"     , "640x360"));
-        itags.add(new Youvitag(100, "Medium Quality 3D"     , "360p"    , "WebM"    , "640x360"));
+        itags.add(new Itag( 17, "Low Quality"           , "144p"    , "3GP"     , "176x144"));
+        itags.add(new Itag( 36, "Low Quality"           , "240p"    , "3GP"     , "320x180"));
+        itags.add(new Itag(  5, "Low Quality"           , "240p"    , "FLV"     , "426x240"));
+        itags.add(new Itag( 34, "Medium Quality"        , "360p"    , "FLV"     , "640x360"));
+        itags.add(new Itag( 18, "Medium Quality"        , "360p"    , "MP4"     , "640x360"));
+        itags.add(new Itag( 43, "Medium Quality"        , "360p"    , "WebM"    , "640x360"));
+        itags.add(new Itag( 82, "Medium Quality 3D"     , "360p"    , "MP4"     , "640x360"));
+        itags.add(new Itag(100, "Medium Quality 3D"     , "360p"    , "WebM"    , "640x360"));
 
-        itags.add(new Youvitag( 35, "Standard Definition"   , "480p"    , "FLV"     , "854x480"));
-        itags.add(new Youvitag( 44, "Standard Definition"   , "480p"    , "WebM"    , "854x480"));
+        itags.add(new Itag( 35, "Standard Definition"   , "480p"    , "FLV"     , "854x480"));
+        itags.add(new Itag( 44, "Standard Definition"   , "480p"    , "WebM"    , "854x480"));
 
-        itags.add(new Youvitag( 22, "High Quality"          , "720p"    , "MP4"     , "1280x720"));
-        itags.add(new Youvitag( 45, "High Quality"          , "720p"    , "WebM"    , "1280x720"));
-        itags.add(new Youvitag( 84, "High Quality 3D"       , "720p"    , "MP4"     , "1280x720"));
-        itags.add(new Youvitag(102, "High Quality 3D"       , "720p"    , "WebM"    , "1280x720"));
+        itags.add(new Itag( 22, "High Quality"          , "720p"    , "MP4"     , "1280x720"));
+        itags.add(new Itag( 45, "High Quality"          , "720p"    , "WebM"    , "1280x720"));
+        itags.add(new Itag( 84, "High Quality 3D"       , "720p"    , "MP4"     , "1280x720"));
+        itags.add(new Itag(102, "High Quality 3D"       , "720p"    , "WebM"    , "1280x720"));
 
-        itags.add(new Youvitag( 37, "Full High Quality"     , "1080p"   , "MP4"     , "1920x1080"));
-        itags.add(new Youvitag( 46, "Full High Quality"     , "1080p"   , "WebM"    , "1280x720"));
+        itags.add(new Itag( 37, "Full High Quality"     , "1080p"   , "MP4"     , "1920x1080"));
+        itags.add(new Itag( 46, "Full High Quality"     , "1080p"   , "WebM"    , "1280x720"));
 
-        itags.add(new Youvitag( 38, "Original Definition"   , ""        , "MP4"     , "4096x3072"));
+        itags.add(new Itag( 38, "Original Definition"   , ""        , "MP4"     , "4096x3072"));
     }
 
-    public int itag;
-    public String description;
-    public String quality;
-    public String format;
-    public String size;
+    public final int itag;
+    public final String description;
+    public final String quality;
+    public final String format;
+    public final String size;
 
-    public Youvitag(){
+    public Itag(){
         this.itag = -1;
         this.description = "N/A";
         this.quality = "N/A";
@@ -73,7 +72,7 @@ public class Youvitag{
         this.size = "N/A";
     }
 
-    public Youvitag(int itag, String description, String quality, String format, String size){
+    public Itag(int itag, String description, String quality, String format, String size){
         this.itag = itag;
         this.description = description;
         this.quality = quality;
@@ -86,11 +85,11 @@ public class Youvitag{
         return (description + ", " + quality + ", " + format + ", " + size);
     }
 
-    public static Youvitag getItag(int itag){
-        for (Youvitag youvitag : itags)
+    public static Itag getItag(int itag){
+        for (Itag youvitag : itags)
             if (youvitag.itag == itag)
                 return youvitag;
-        return new Youvitag();
+        return new Itag();
     }
 
     public static int getItagIndex(int itag){
@@ -101,10 +100,10 @@ public class Youvitag{
     }
 
     public static String getItagDescription(int itag){
-        Youvitag youvitag = getItag(itag);
+        Itag youvitag = getItag(itag);
         if (youvitag != null)
             return youvitag.toString();
-        return new Youvitag().toString();
+        return new Itag().toString();
     }
 
     public static int compare(Integer itag1, Integer itag2) {

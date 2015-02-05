@@ -1,9 +1,7 @@
 package com.eightpsman.youvider;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.List;
+import java.io.IOException;
+import java.util.Scanner;
 
 /**
  * Youvider
@@ -19,98 +17,51 @@ import java.util.List;
 
 public class Demo {
 
+    static Scanner scanner = new Scanner(System.in);
+
     public static void main(String args[]) throws IOException {
 
-        String webLink = "https://www.youtube.com/watch?v=j86i-xHzYXc";
+        String webLink = null;
 
-        String content = Youvider.getWebContent(webLink);
-
-        YouviderMpd mpd = YouviderParser.parseEncodedStream(content);
-
-//
-//        for (YouviderMpd.Mpd m: mpd.getMpdList()) {
-//            String itag = m.getParam("itag");
-//            System.out.println(itag + ": " + Youvitag.getDescription(Integer.parseInt(itag)));
-//        }
-
-//        YouviderParser.parseVideoInfo(content);
-
-//        if (true)
-        if (mpd.getMpdList().size() == 0)
-            return;
-
-        YouviderMpd.Mpd targetMpd = mpd.getMdp(mpd.getMpdList().size()-1);
-        Youvitag itag = Youvitag.getItag(targetMpd.getItag());
-
-        String link = mpd.getMpdList().get(0).getParam("url");
-        String videoTitle = mpd.getVideoTitle();
-
-        for (YouviderMpd.Mpd m: mpd.getMpdList()){
-            if (m.getParam("itag").equals("36"))
-                link = m.getParam("url");
+        if (webLink == null){
+            System.out.println("Youtube video link:");
+            webLink = scanner.next();
         }
 
-        InputStream input = null;
-        OutputStream output = null;
-        HttpURLConnection connection = null;
-        URL url = null;
+        System.out.println("Getting video info ...");
+        YouviderInfo info = Youvider.getVideoInfo(webLink);
 
-        try {
-            url = new URL(link);
-            connection = (HttpURLConnection )url.openConnection();
-            connection.connect();
+        if (info != null){
+            if (info.encodedStreams != null && info.encodedStreams.size() > 0){
+                /** Get user's choice of video to download */
+                for (int i=0; i<info.encodedStreams.size(); i++){
+                    EncodedStream s = info.encodedStreams.get(i);
+                    System.out.println((i+1) + ": " + s.itag.toString());
+                }
+                System.out.print("Choose video to download (0 to exit): ");
+                int choice;
+                while (true){
+                    String sChoice = scanner.next();
+                    try{
+                        choice = Integer.parseInt(sChoice);
+                        if (choice >= 0 && choice <= info.encodedStreams.size())
+                            break;
+                    }catch (Exception ex){
 
-//            connection.setReadTimeout(20000);
-
-            // Output file
-            File file = new File(String.format("E:/%s.%s", videoTitle, itag.format.toLowerCase()));
-
-            /** video size length */
-            int fileLength = connection.getContentLength();
-
-            System.out.println("File size: " + (fileLength / 1024f / 1024f) + " MB");
-
-            /** download video */
-            input = new BufferedInputStream(connection.getInputStream());
-            output = new FileOutputStream(file);
-
-            byte buffered[] = new byte[1024];
-            long downloaded = 0;
-            int count;
-            int progress = 0;
-
-            while (true) {
-                count = input.read(buffered);
-                if (count < 0) break;
-                downloaded += count;
-                output.write(buffered, 0, count);
-
-                if (fileLength > 0){
-                    int newProgress = (int)(downloaded * 100f / fileLength);
-                    if (newProgress > progress){
-                        progress = newProgress;
-                        System.out.println("Downloading... " + progress + "%%");
+                    }
+                    System.out.print("Invalid choice, choose again (0 to exit): ");
+                }
+                if (choice > 0){
+                    EncodedStream stream = info.encodedStreams.get(choice - 1);
+                    boolean result = Youvider.downloadEncodedStream(
+                            stream,
+                            String.format("E:/%s.%s", info.videoTitle, stream.itag.format)) ;
+                    if (result){
+                        System.out.println("Download finished successfully");
+                    }else{
+                        System.out.println("Error downloading video");
                     }
                 }
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception ex){
-            ex.printStackTrace();
-        }
-        finally {
-            try {
-                if (output != null)
-                    output.flush();
-                if (output != null)
-                    output.close();
-                if (input!= null)
-                    input.close();
-                if (connection != null)
-                    connection.disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
